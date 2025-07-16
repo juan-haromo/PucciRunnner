@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -12,6 +13,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float moveSpeed;
     [SerializeField] Animator animator;
     [SerializeField, Range(1,3)] float animationSpeedMultiplier = 1f;
+    [SerializeField] Material background;
+    [SerializeField] Material ground;
+    [SerializeField] float backgroundSpeed = 0;
 
     void Start()
     {
@@ -42,6 +46,21 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
         }
         animator.SetFloat("Speed",moveDirection * animationSpeedMultiplier);
+        Crawl();
+        backgroundSpeed += Time.deltaTime * 0.01f;
+        background.SetFloat("_Speed", backgroundSpeed);
+        ground.SetFloat("_Speed", -backgroundSpeed);
+    }
+
+    private void OnDisable()
+    {
+        background.SetFloat("_Speed", 0);
+        ground.SetFloat("_Speed", 0);
+    }
+
+    void Crawl()
+    {
+        if (!canJump) { return; }
         animator.SetBool("IsCrawling", input.Runner.Crawl.IsPressed());
     }
 
@@ -51,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
         if (!canJump) { return; }
         animator.SetTrigger("Jump");
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        rb.AddForce(Vector3.up * jumpFoce, ForceMode.Impulse);
+        rb.AddForce(transform.up * jumpFoce, ForceMode.Impulse);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -59,6 +78,7 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Ground"))
         {
             canJump = true;
+            animator.SetBool("Grounded", true);
         }
     }
 
@@ -67,6 +87,7 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Ground"))
         {
             canJump = false;
+            animator.SetBool("Grounded", false);
         }
     }
 
@@ -83,6 +104,19 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!canJump) { return; }
         Physics.gravity *= -1;
-        transform.Rotate(Vector3.left, 180);
+        StartCoroutine(FlipModel());
+    }
+
+    IEnumerator FlipModel()
+    {
+        float i = 0;
+        while (i < 180)
+        {
+            yield return new WaitForEndOfFrame();
+            transform.Rotate(Vector3.left, 150 * Time.deltaTime);
+            i += 150 * Time.deltaTime;
+            
+        }
+
     }
 }

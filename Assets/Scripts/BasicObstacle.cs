@@ -21,7 +21,7 @@ public class BasicObstacle : MonoBehaviour
             transform.Translate(Vector3.left * Time.deltaTime * horizontalSpeed);
     }
 
-    void OnTriggerEnter(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
             Destroy(other.gameObject);

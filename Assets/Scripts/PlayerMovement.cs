@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float jumpFoce = 5;
-    private Rigidbody rb;
+    [SerializeField] Rigidbody rb;
     PlayerInput input;
     bool canJump = false;
     float moveDirection;
@@ -19,7 +19,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
 
         input = new PlayerInput();
         input.Runner.Enable();
@@ -32,6 +31,10 @@ public class PlayerMovement : MonoBehaviour
     {
         input.Runner.Jump.performed -= Jump;
         input.Runner.Flip.performed -= Flip;
+        input.Runner.Disable();
+        background.SetFloat("_Speed", 0);
+        ground.SetFloat("_Speed", 0);
+        ScoreManager.Instance.Lose();
     }
 
     private void Update()
@@ -50,12 +53,6 @@ public class PlayerMovement : MonoBehaviour
         backgroundSpeed += Time.deltaTime * 0.01f;
         background.SetFloat("_Speed", backgroundSpeed);
         ground.SetFloat("_Speed", -backgroundSpeed);
-    }
-
-    private void OnDisable()
-    {
-        background.SetFloat("_Speed", 0);
-        ground.SetFloat("_Speed", 0);
     }
 
     void Crawl()
@@ -113,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
         while (i < 180)
         {
             yield return new WaitForEndOfFrame();
-            transform.Rotate(Vector3.left, 150 * Time.deltaTime);
+            transform.Rotate(Vector3.forward, 150 * Time.deltaTime);
             i += 150 * Time.deltaTime;
             
         }

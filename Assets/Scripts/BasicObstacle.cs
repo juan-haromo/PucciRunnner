@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class BasicObstacle : MonoBehaviour
 {
-    public float horizontalSpeed = 5f;
-
+    public float horizontalSpeed;
     public Transform maxPosition;
+    
     // Update is called once per frame
     void Update()
     {
+        horizontalSpeed = GetComponentInParent<SpawnManager>().obstaclesSpeed;
+        maxPosition = GetComponentInParent<SpawnManager>().maxPosition;
         HorizontalMovement();
     }
 

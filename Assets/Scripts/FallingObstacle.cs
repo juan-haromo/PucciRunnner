@@ -6,7 +6,8 @@ public class FallingObstacle : BasicObstacle
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        horizontalSpeed = GetComponentInParent<SpawnManager>().obstaclesSpeed;
+        maxPosition = GetComponentInParent<SpawnManager>().maxPosition;
     }
 
     // Update is called once per frame

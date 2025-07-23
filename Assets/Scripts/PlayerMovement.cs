@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -9,6 +11,11 @@ public class PlayerMovement : MonoBehaviour
     bool canJump = false;
     float moveDirection;
     [SerializeField] float moveSpeed;
+    [SerializeField] Animator animator;
+    [SerializeField, Range(1,3)] float animationSpeedMultiplier = 1f;
+    [SerializeField] Material background;
+    [SerializeField] Material ground;
+    [SerializeField] float backgroundSpeed = 0;
 
     void Start()
     {
@@ -17,11 +24,14 @@ public class PlayerMovement : MonoBehaviour
         input = new PlayerInput();
         input.Runner.Enable();
         input.Runner.Jump.performed += Jump;
+        input.Runner.Flip.performed += Flip;
+        StartCoroutine(SpeedUp());
     }
 
     private void OnDestroy()
     {
         input.Runner.Jump.performed -= Jump;
+        input.Runner.Flip.performed -= Flip;
     }
 
     private void Update()
@@ -35,14 +45,32 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
         }
+        animator.SetFloat("Speed",moveDirection * animationSpeedMultiplier);
+        Crawl();
+        backgroundSpeed += Time.deltaTime * 0.01f;
+        background.SetFloat("_Speed", backgroundSpeed);
+        ground.SetFloat("_Speed", -backgroundSpeed);
+    }
+
+    private void OnDisable()
+    {
+        background.SetFloat("_Speed", 0);
+        ground.SetFloat("_Speed", 0);
+    }
+
+    void Crawl()
+    {
+        if (!canJump) { return; }
+        animator.SetBool("IsCrawling", input.Runner.Crawl.IsPressed());
     }
 
 
     private void Jump(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         if (!canJump) { return; }
+        animator.SetTrigger("Jump");
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        rb.AddForce(Vector3.up * jumpFoce, ForceMode.Impulse);
+        rb.AddForce(transform.up * jumpFoce, ForceMode.Impulse);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -50,6 +78,7 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Ground"))
         {
             canJump = true;
+            animator.SetBool("Grounded", true);
         }
     }
 
@@ -58,6 +87,36 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Ground"))
         {
             canJump = false;
+            animator.SetBool("Grounded", false);
         }
+    }
+
+    IEnumerator SpeedUp()
+    {
+        while (animationSpeedMultiplier < 3)
+        {
+            yield return new WaitForSeconds(20);
+            animationSpeedMultiplier += 1;
+        }
+    }
+
+    public void Flip(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        if (!canJump) { return; }
+        Physics.gravity *= -1;
+        StartCoroutine(FlipModel());
+    }
+
+    IEnumerator FlipModel()
+    {
+        float i = 0;
+        while (i < 180)
+        {
+            yield return new WaitForEndOfFrame();
+            transform.Rotate(Vector3.left, 150 * Time.deltaTime);
+            i += 150 * Time.deltaTime;
+            
+        }
+
     }
 }

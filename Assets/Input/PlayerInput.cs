@@ -108,6 +108,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Crawl"",
+                    ""type"": ""Button"",
+                    ""id"": ""da01b8b8-5ff2-44d2-b1c7-5ff185777220"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Flip"",
+                    ""type"": ""Button"",
+                    ""id"": ""c42a51d9-2cec-415e-8c0d-eba889cdd939"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -154,6 +172,28 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""47908e61-9f17-45b2-aeea-cdddcbdd4d0d"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Crawl"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7122a6e8-1a6e-4f48-8088-8e7556d307fd"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Flip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +204,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Runner = asset.FindActionMap("Runner", throwIfNotFound: true);
         m_Runner_Jump = m_Runner.FindAction("Jump", throwIfNotFound: true);
         m_Runner_Move = m_Runner.FindAction("Move", throwIfNotFound: true);
+        m_Runner_Crawl = m_Runner.FindAction("Crawl", throwIfNotFound: true);
+        m_Runner_Flip = m_Runner.FindAction("Flip", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -246,6 +288,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private List<IRunnerActions> m_RunnerActionsCallbackInterfaces = new List<IRunnerActions>();
     private readonly InputAction m_Runner_Jump;
     private readonly InputAction m_Runner_Move;
+    private readonly InputAction m_Runner_Crawl;
+    private readonly InputAction m_Runner_Flip;
     /// <summary>
     /// Provides access to input actions defined in input action map "Runner".
     /// </summary>
@@ -265,6 +309,14 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Runner/Move".
         /// </summary>
         public InputAction @Move => m_Wrapper.m_Runner_Move;
+        /// <summary>
+        /// Provides access to the underlying input action "Runner/Crawl".
+        /// </summary>
+        public InputAction @Crawl => m_Wrapper.m_Runner_Crawl;
+        /// <summary>
+        /// Provides access to the underlying input action "Runner/Flip".
+        /// </summary>
+        public InputAction @Flip => m_Wrapper.m_Runner_Flip;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -297,6 +349,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @Crawl.started += instance.OnCrawl;
+            @Crawl.performed += instance.OnCrawl;
+            @Crawl.canceled += instance.OnCrawl;
+            @Flip.started += instance.OnFlip;
+            @Flip.performed += instance.OnFlip;
+            @Flip.canceled += instance.OnFlip;
         }
 
         /// <summary>
@@ -314,6 +372,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @Crawl.started -= instance.OnCrawl;
+            @Crawl.performed -= instance.OnCrawl;
+            @Crawl.canceled -= instance.OnCrawl;
+            @Flip.started -= instance.OnFlip;
+            @Flip.performed -= instance.OnFlip;
+            @Flip.canceled -= instance.OnFlip;
         }
 
         /// <summary>
@@ -368,5 +432,19 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMove(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Crawl" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCrawl(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Flip" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFlip(InputAction.CallbackContext context);
     }
 }

@@ -49,9 +49,12 @@ public class ScoreManager : MonoBehaviour
     }
     public void Lose()
     {
-        gamePanel.SetActive(false);
-        loseDisplay.text = "Game over\nFinal score " + (int)score;
-        losePanel.SetActive(true);
+        gamePanel?.SetActive(false);
+        if (loseDisplay != null)
+        {
+            loseDisplay.text = "Game over\nFinal score " + (int)score;
+        }
+        losePanel?.SetActive(true);
     }
     public void Restart()
     {

@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     float moveDirection;
     [SerializeField] float moveSpeed;
     [SerializeField] Animator animator;
-    [SerializeField, Range(1,3)] float animationSpeedMultiplier = 1f;
+    [SerializeField, Range(1, 3)] float animationSpeedMultiplier = 1f;
     [SerializeField] Material background;
     [SerializeField] Material ground;
     [SerializeField] float backgroundSpeed = 0;
@@ -34,13 +34,13 @@ public class PlayerMovement : MonoBehaviour
         input.Runner.Disable();
         background.SetFloat("_Speed", 0);
         ground.SetFloat("_Speed", 0);
-        ScoreManager.Instance.Lose();
+        ScoreManager.Instance?.Lose();
     }
 
     private void Update()
     {
         moveDirection = input.Runner.Move.ReadValue<float>();
-        if(moveDirection != 0)
+        if (moveDirection != 0)
         {
             rb.linearVelocity = new Vector3(moveDirection * moveSpeed, rb.linearVelocity.y, 0);
         }
@@ -48,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
         }
-        animator.SetFloat("Speed",moveDirection * animationSpeedMultiplier);
+        animator.SetFloat("Speed", moveDirection * animationSpeedMultiplier);
         Crawl();
         backgroundSpeed += Time.deltaTime * 0.01f;
         background.SetFloat("_Speed", backgroundSpeed);
@@ -61,13 +61,17 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsCrawling", input.Runner.Crawl.IsPressed());
     }
 
+    public void Jump()
+    {
+        animator.SetTrigger("Jump");
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        rb.AddForce(transform.up * jumpFoce, ForceMode.Impulse);
+    }
 
     private void Jump(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         if (!canJump) { return; }
-        animator.SetTrigger("Jump");
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        rb.AddForce(transform.up * jumpFoce, ForceMode.Impulse);
+        Jump();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -96,12 +100,16 @@ public class PlayerMovement : MonoBehaviour
             animationSpeedMultiplier += 1;
         }
     }
+    public void Flip()
+    {
+        Physics.gravity *= -1;
+        StartCoroutine(FlipModel());
+    }
 
     public void Flip(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         if (!canJump) { return; }
-        Physics.gravity *= -1;
-        StartCoroutine(FlipModel());
+        Flip();
     }
 
     IEnumerator FlipModel()
@@ -112,7 +120,7 @@ public class PlayerMovement : MonoBehaviour
             yield return new WaitForEndOfFrame();
             transform.Rotate(Vector3.forward, 150 * Time.deltaTime);
             i += 150 * Time.deltaTime;
-            
+
         }
 
     }
